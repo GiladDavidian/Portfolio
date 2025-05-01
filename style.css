@@ -169,7 +169,7 @@ body {
 
 #header2 {
     height: 460px;
-    background-image: url(beige3.jpg);
+    background-image: url(images/beige3.jpg);
     text-align: center;
     padding-top: 100px;
 }
@@ -261,7 +261,7 @@ body {
 }
 
 #projects {
-    background-image: url(beige3.jpg);
+    background-image: url(images/beige3.jpg);
     margin-top: 100px;
     display: grid;
     align-items: center;
@@ -320,7 +320,7 @@ body {
     width: 100%;
     background-color: black;
     direction: rtl;
-    background-image: url(logo1.png);
+    background-image: url(images/logo1.png);
     background-repeat: no-repeat;
 }
 
