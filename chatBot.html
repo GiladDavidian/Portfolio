@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bot</title>
+    <style>
+        .psichiH1 {
+            text-align: center;
+            font-size: 3.5rem;
+            font-family: arial;
+        }
+
+        .svp {
+            width: 40px;
+            height: 40px;
+        }
+
+        .psichiP {
+            text-align: center;
+            font-size: 2.5rem;
+            font-family: arial;
+            direction: rtl;
+        }
+
+        .chat-container {
+            width: 350px;
+            /* קצת יותר רחב */
+            height: 450px;
+            /* קצת יותר גבוה */
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            padding: 10px;
+            overflow-y: auto;
+            /* שימוש ב-auto כדי להציג פס גלילה רק כשצריך */
+            display: flex;
+            flex-direction: column;
+            /* כדי שההודעות יסתדרו מלמעלה למטה */
+        }
+
+        .message-container {
+            display: flex;
+            width: 100%;
+            margin-bottom: 8px;
+            /* מרווח בין הודעות */
+            align-items: flex-start;
+            /* יישור אנכי של האייקונים */
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 10px;
+            direction: rtl;
+            word-break: break-word;
+            /* מניעת גלישה של מילים ארוכות */
+            flex-grow: 1;
+            /* מאפשר להודעה לגדול */
+        }
+
+        .user-message {
+            background-color: #e3f2fd;
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            text-align: left;
+            border-bottom-left-radius: 0;
+        }
+
+        .input-area {
+            width: 350px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            direction: rtl;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .warning {
+            direction: rtl;
+            text-align: center;
+            color: black;
+            font-weight: bold;
+            font-family: arial;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .bot-icon,
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+            /* מניעת כיווץ האייקון */
+        }
+
+        .bot-icon {
+            background-color: #007bff;
+        }
+
+        .user-icon {
+            background-color: #28a745;
+        }
+
+        .loading-indicator {
+            text-align: left;
+            font-size: 0.8rem;
+            color: #777;
+            direction: rtl;
+            margin-right: 40px;
+            /* כדי שיהיה מיושר עם הודעת הבוט */
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #777;
+            margin-left: 3px;
+            animation: blink 1s infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="psichiH1">GD <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100"
+            viewBox="0 0 50 50" class="svp">
+            <path
+                d="M5,5v40h40V5H5z M25.399,28.028l-2.522,4.611c-0.19,0.347-0.534,0.52-0.877,0.52s-0.688-0.173-0.877-0.52l-2.522-4.611 c-0.551-1.007-1.378-1.835-2.385-2.385l-4.611-2.522c-0.694-0.379-0.694-1.375,0-1.755l4.611-2.522 c1.007-0.551,1.834-1.378,2.385-2.385l2.522-4.611c0.19-0.347,0.534-0.52,0.877-0.52s0.688,0.173,0.877,0.52l2.522,4.611 c0.551,1.007,1.378,1.834,2.385,2.385l4.611,2.522c0.694,0.379,0.694,1.375,0,1.755l-4.611,2.522 C26.778,26.193,25.95,27.021,25.399,28.028z M39.157,35.289l-2.244,1.227c-0.167,0.093-0.305,0.23-0.397,0.398l-1.228,2.244 c-0.21,0.386-0.613,0.625-1.053,0.625c-0.001,0-0.002,0-0.003,0c-0.44-0.001-0.844-0.242-1.053-0.631l-1.225-2.238 c-0.093-0.169-0.23-0.307-0.397-0.397l-2.245-1.229c-0.387-0.212-0.626-0.616-0.625-1.056c0.002-0.439,0.242-0.842,0.628-1.051 l2.241-1.227c0.169-0.093,0.306-0.229,0.397-0.397l1.229-2.246c0.207-0.382,0.609-0.622,1.049-0.624c0.001,0,0.002,0,0.003,0 c0.438,0,0.841,0.239,1.053,0.623v0.002l1.228,2.245c0.092,0.167,0.229,0.305,0.398,0.397l2.245,1.229 c0.382,0.205,0.623,0.608,0.624,1.049S39.545,35.078,39.157,35.289z">
+            </path>
+        </svg></h1>
+    <p class="psichiP">הבוט האישי שלך!</p>
+    <div class="chat-container" id="chat">
+        <div class="message-container">
+            <div class="bot-icon">🤖</div>
+            <div class="message bot-message">שלום! איך אני יכול לעזור לך?</div>
+        </div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="כתוב הודעה...">
+        <button onclick="sendMessage()">שלח</button>
+    </div>
+    <p class="warning">הבוט משתמש במפתח API של גוגל, הבוט עלול לטעות ולכן יש לבדוק היטב את התשובות שלו.</p>
+
+    <script>
+        const API_KEY = 'AIzaSyAd12wmhDjKeS9zTBbzCyT5u2QFITx_afE';
+        const chatContainer = document.getElementById("chat");
+
+        async function getBotResponse(userMessage) {
+            try {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "contents": [{
+                                "parts": [{ "text": userMessage }]
+                            }]
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('תקלה בקריאה ל-API');
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text || "לא קיבלתי תגובה תקינה מה-API.";
+            } catch (error) {
+                console.error('שגיאה:', error);
+                return "מצטער, משהו השתבש. נסה שוב!";
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+            if (message === "") return;
+
+            // הוספת הודעת המשתמש
+            const userMessageContainer = document.createElement("div");
+            userMessageContainer.className = "message-container";
+            userMessageContainer.innerHTML = `
+                <div class="user-icon">👤</div>
+                <div class="message user-message">${message}</div>
+            `;
+            chatContainer.appendChild(userMessageContainer);
+
+            // הוספת הודעת "טוען..." של הבוט
+            const botLoadingContainer = document.createElement("div");
+            botLoadingContainer.className = "message-container";
+            botLoadingContainer.innerHTML = `
+                <div class="bot-icon">🤖</div>
+                <div class="loading-indicator">
+                    ממתין לתגובה<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
+                </div>
+            `;
+            chatContainer.appendChild(botLoadingContainer);
+
+            // גלילה למטה
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            input.value = ""; // ניקוי השדה מיד לאחר שליחה
+
+            // קבלת תגובה מה-API ועדכון ההודעה
+            const botResponse = await getBotResponse(message);
+
+            // הסרת הודעת הטעינה והוספת התגובה האמיתית
+            chatContainer.removeChild(botLoadingContainer);
+
+            const botMessageContainer = document.createElement("div");
+            botMessageContainer.className = "message-container";
+            botMessageContainer.innerHTML = `
+                <div class="bot-icon">🤖</div>
+                <div class="message bot-message">${botResponse}</div>
+            `;
+            chatContainer.appendChild(botMessageContainer);
+
+            // גלילה למטה לאחר קבלת התגובה
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // שליחה עם Enter
+        document.getElementById("userInput").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // גלילה אוטומטית לתחתית בעת טעינת הדף
+        window.onload = function () {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+    </script>
+</body>
+
+</html>
